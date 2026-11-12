@@ -16,4 +16,24 @@ def tax_owed(taxable_income, brackets):
         lower = upper
     return tax
 
-print(tax_owed(50_000, TEST_BRACKETS))
+def take_home(gross, brackets):
+    return gross - tax_owed(gross, brackets)
+
+def gross_needed(target_take_home, brackets):
+    low = target_take_home        # you can't need less gross than your take-home
+    high = target_take_home * 2   # a first upper guess
+
+    # If the upper guess is still too low, keep doubling it
+    while take_home(high, brackets) < target_take_home:
+        high = high * 2
+
+    # Repeatedly guess the middle and shrink the range
+    for _ in range(100):
+        mid = (low + high) / 2
+        if take_home(mid, brackets) < target_take_home:
+            low = mid     # take-home too low, so the answer is higher
+        else:
+            high = mid    # take-home high enough, so the answer is lower or equal
+    return round(high, 2)
+
+print(gross_needed(33_000, TEST_BRACKETS))
