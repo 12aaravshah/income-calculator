@@ -1,5 +1,5 @@
 import sqlite3
-from tax_data import TAX_YEARS
+from tax_data import TAX_YEARS, STATE_TAX
 from city_data import CITIES
 
 conn = sqlite3.connect("calculator.db")
@@ -7,30 +7,50 @@ cur = conn.cursor()
 
 cur.execute("DROP TABLE IF EXISTS tax_years")
 cur.execute("DROP TABLE IF EXISTS brackets")
+cur.execute("DROP TABLE IF EXISTS state_rules")
+cur.execute("DROP TABLE IF EXISTS state_brackets")
 cur.execute("DROP TABLE IF EXISTS city_costs")
 cur.execute("DROP TABLE IF EXISTS cities")
 
 cur.execute("""
 CREATE TABLE tax_years (
-    year INTEGER PRIMARY KEY,
-    standard_deduction REAL,
-    ss_wage_base REAL
+     year INTEGER PRIMARY KEY,
+     standard_deduction REAL,
+     ss_wage_base REAL
 )
 """)
 
 cur.execute("""
 CREATE TABLE brackets (
-    year INTEGER,
-    upper_limit REAL,
-    rate REAL
+     year INTEGER,
+     upper_limit REAL,
+     rate REAL
+)
+""")
+
+cur.execute("""
+CREATE TABLE state_rules (
+     year INTEGER,
+     state TEXT,
+     deduction REAL,
+     credit REAL
+)
+""")
+
+cur.execute("""
+CREATE TABLE state_brackets (
+     year INTEGER,
+     state TEXT,
+     upper_limit REAL,
+     rate REAL
 )
 """)
 
 cur.execute("""
 CREATE TABLE cities (
-    city_id INTEGER PRIMARY KEY,
-    city TEXT,
-    state TEXT
+     city_id INTEGER PRIMARY KEY,
+     city TEXT,
+     state TEXT
 )
 """)
 
@@ -56,6 +76,20 @@ for year, data in TAX_YEARS.items():
             (year, upper, rate),
         )
 
+for year, states in STATE_TAX.items():
+    for state, data in states.items():
+        cur.execute(
+            "INSERT INTO state_rules (year, state, deduction, credit) VALUES (?, ?, ?, ?)",
+            (year, state, data["deduction"], data["credit"]),
+        )
+        for upper, rate in data["brackets"]:
+            if upper == float("inf"):
+                upper = None
+            cur.execute(
+                "INSERT INTO state_brackets (year, state, upper_limit, rate) VALUES (?, ?, ?, ?)",
+                (year, state, upper, rate),
+            )
+
 for city, info in CITIES.items():
     cur.execute(
         "INSERT INTO cities (city, state) VALUES (?, ?)",
@@ -74,14 +108,8 @@ print("cities table:")
 for row in cur.execute("SELECT * FROM cities ORDER BY city_id"):
     print(row)
 
-print("Austin costs (using a JOIN):")
-for row in cur.execute("""
-    SELECT city_costs.category, city_costs.monthly_cost
-    FROM city_costs
-    JOIN cities ON cities.city_id = city_costs.city_id
-    WHERE cities.city = 'Austin'
-    ORDER BY city_costs.rowid
-"""):
+print("state_rules table:")
+for row in cur.execute("SELECT * FROM state_rules ORDER BY state"):
     print(row)
 
 conn.close()

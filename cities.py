@@ -50,3 +50,11 @@ def get_all_city_totals():
     rows = cur.fetchall()
     conn.close()
     return rows
+
+def get_city_state(city):
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute("SELECT state FROM cities WHERE city = ?", (city,))
+    state = cur.fetchone()[0]
+    conn.close()
+    return state
