@@ -1,5 +1,5 @@
 import sqlite3
-from tax import TAX_YEARS
+from tax_data import TAX_YEARS
 
 conn = sqlite3.connect("calculator.db")
 cur = conn.cursor()
