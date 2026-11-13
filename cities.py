@@ -32,3 +32,21 @@ def get_city_costs(city):
         costs[category] = amount
     conn.close()
     return costs
+
+
+
+def get_all_city_totals():
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT cities.city, cities.state, SUM(city_costs.monthly_cost) AS monthly_total
+        FROM cities
+        JOIN city_costs ON city_costs.city_id = cities.city_id
+        GROUP BY cities.city_id
+        ORDER BY monthly_total
+        """
+    )
+    rows = cur.fetchall()
+    conn.close()
+    return rows
