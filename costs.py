@@ -1,13 +1,14 @@
 from tax import gross_needed
+from cities import list_cities, get_city_costs
 
 YEAR = 2026
 
-categories = ["rent", "groceries", "transport", "phone_internet", "shopping", "other"]
 
-
-def ask_number(question):
+def ask_number(question, default=None):
     while True:
         answer = input(question)
+        if answer == "" and default is not None:
+            return default
         try:
             number = float(answer)
         except ValueError:
@@ -19,11 +20,26 @@ def ask_number(question):
         return number
 
 
-print("Enter your MONTHLY costs in dollars.")
+def ask_city():
+    cities = list_cities()
+    print("Cities available:", ", ".join(cities))
+    while True:
+        name = input("Pick a city: ").strip()
+        for city in cities:
+            if city.lower() == name.lower():
+                return city
+        print("City not found. Try again.")
 
+
+city = ask_city()
+defaults = get_city_costs(city)
+
+print("Press Enter to keep the default, or type your own MONTHLY cost.")
 monthly_costs = {}
-for category in categories:
-    monthly_costs[category] = ask_number(category + ": ")
+for category, default in defaults.items():
+    monthly_costs[category] = ask_number(
+        category + " [" + str(round(default)) + "]: ", default
+    )
 
 while True:
     savings_percent = ask_number("Percent of take-home to save (0 for none): ")
@@ -34,6 +50,7 @@ while True:
 yearly_costs = sum(monthly_costs.values()) * 12
 take_home_needed = yearly_costs / (1 - savings_percent / 100)
 
+print("City:", city)
 print("Yearly costs:", round(yearly_costs, 2))
 print("Take-home needed:", round(take_home_needed, 2))
 print("Gross salary needed:", gross_needed(take_home_needed, YEAR))
