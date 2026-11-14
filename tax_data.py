@@ -41,6 +41,8 @@ TAX_YEARS = {
 INCOME_TAX = {
     2026: {
         "TX": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
+        "FL": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
+        "WA": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
         "IL": {"brackets": [(float("inf"), 0.0495)], "deduction": 2_925, "credit": 0},
         "NY": {
             "brackets": [
