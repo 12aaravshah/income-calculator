@@ -43,6 +43,34 @@ INCOME_TAX = {
         "TX": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
         "FL": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
         "WA": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
+        "GA": {"brackets": [(float("inf"), 0.0499)], "deduction": 15_000, "credit": 0},
+        "NC": {"brackets": [(float("inf"), 0.0399)], "deduction": 12_750, "credit": 0},
+        "AZ": {"brackets": [(float("inf"), 0.025)], "deduction": 16_100, "credit": 0},
+        "CO": {"brackets": [(float("inf"), 0.044)], "deduction": 16_100, "credit": 0},
+        "MA": {"brackets": [(float("inf"), 0.05)], "deduction": 4_400, "credit": 0},
+        "MN": {
+            "brackets": [
+                (33_310, 0.0535),
+                (109_430, 0.068),
+                (203_150, 0.0785),
+                (float("inf"), 0.0985),
+            ],
+            "deduction": 15_300,
+            "credit": 0,
+        },
+        "DC": {
+            "brackets": [
+                (10_000, 0.04),
+                (40_000, 0.06),
+                (60_000, 0.065),
+                (250_000, 0.085),
+                (500_000, 0.0925),
+                (1_000_000, 0.0975),
+                (float("inf"), 0.1075),
+            ],
+            "deduction": 15_000,
+            "credit": 0,
+        },
         "IL": {"brackets": [(float("inf"), 0.0495)], "deduction": 2_925, "credit": 0},
         "NY": {
             "brackets": [
