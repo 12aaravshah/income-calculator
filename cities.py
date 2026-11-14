@@ -34,13 +34,29 @@ def get_city_costs(city):
     return costs
 
 
+def tax_codes(state, local_tax):
+    codes = [state]
+    if local_tax is not None:
+        codes.append(local_tax)
+    return codes
+
+
+def get_city_taxes(city):
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute("SELECT state, local_tax FROM cities WHERE city = ?", (city,))
+    state, local_tax = cur.fetchone()
+    conn.close()
+    return tax_codes(state, local_tax)
+
 
 def get_all_city_totals():
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT cities.city, cities.state, SUM(city_costs.monthly_cost) AS monthly_total
+        SELECT cities.city, cities.state, cities.local_tax,
+               SUM(city_costs.monthly_cost) AS monthly_total
         FROM cities
         JOIN city_costs ON city_costs.city_id = cities.city_id
         GROUP BY cities.city_id
@@ -50,11 +66,3 @@ def get_all_city_totals():
     rows = cur.fetchall()
     conn.close()
     return rows
-
-def get_city_state(city):
-    conn = sqlite3.connect(DB_FILE)
-    cur = conn.cursor()
-    cur.execute("SELECT state FROM cities WHERE city = ?", (city,))
-    state = cur.fetchone()[0]
-    conn.close()
-    return state

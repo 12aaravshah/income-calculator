@@ -30,14 +30,15 @@ TAX_YEARS = {
 }
 
 
-# State income tax, single filer, wages only.
+# Income tax for states and cities, single filer, wages only.
+# Each place has a short code: a state's postal code, or "NYC".
 # Sources: CA - Franchise Tax Board, Tax News October 2026 (2026 Schedule X).
-#          NY - NYS Dept. of Taxation and Finance, Form IT-2105-I (2026).
+#          NY and NYC - NYS Dept. of Taxation and Finance, Form IT-2105-I (2026).
 #          IL - Illinois Dept. of Revenue (4.95% flat; 2026 exemption $2,925).
 #          TX - no state income tax.
 # "deduction" is subtracted from income before the brackets apply.
 # "credit" is subtracted from the tax after the brackets apply.
-STATE_TAX = {
+INCOME_TAX = {
     2026: {
         "TX": {"brackets": [(float("inf"), 0.0)], "deduction": 0, "credit": 0},
         "IL": {"brackets": [(float("inf"), 0.0495)], "deduction": 2_925, "credit": 0},
@@ -52,6 +53,16 @@ STATE_TAX = {
                 (5_000_000, 0.0965),
                 (25_000_000, 0.103),
                 (float("inf"), 0.109),
+            ],
+            "deduction": 8_000,
+            "credit": 0,
+        },
+        "NYC": {
+            "brackets": [
+                (12_000, 0.03078),
+                (25_000, 0.03762),
+                (50_000, 0.03819),
+                (float("inf"), 0.03876),
             ],
             "deduction": 8_000,
             "credit": 0,

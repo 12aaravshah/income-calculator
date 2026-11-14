@@ -1,5 +1,5 @@
 from tax import gross_needed
-from cities import list_cities, get_city_costs, get_city_state
+from cities import list_cities, get_city_costs, get_city_taxes
 
 YEAR = 2026
 
@@ -32,7 +32,7 @@ def ask_city():
 
 
 city = ask_city()
-state = get_city_state(city)
+taxes = get_city_taxes(city)
 defaults = get_city_costs(city)
 
 print("Press Enter to keep the default, or type your own MONTHLY cost.")
@@ -51,8 +51,10 @@ while True:
 yearly_costs = sum(monthly_costs.values()) * 12
 take_home_needed = yearly_costs / (1 - savings_percent / 100)
 
-print("City:", city + ", " + state)
+label = " + ".join(taxes)
+
+print("City:", city)
 print("Yearly costs:", round(yearly_costs, 2))
 print("Take-home needed:", round(take_home_needed, 2))
 print("Gross salary needed (federal + FICA only):", gross_needed(take_home_needed, YEAR))
-print("Gross salary needed (with " + state + " income tax):", gross_needed(take_home_needed, YEAR, state))
+print("Gross salary needed (with " + label + " income tax):", gross_needed(take_home_needed, YEAR, taxes))

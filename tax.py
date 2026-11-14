@@ -67,27 +67,27 @@ def fica_tax(gross, year):
     medicare = gross * MEDICARE_RATE
     return social_security + medicare
 
-_state_cache = {}
+_rules_cache = {}
 
 
-def load_state_tax_data(state, year):
+def load_tax_rules(code, year):
     conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT deduction, credit FROM state_rules WHERE state = ? AND year = ?",
-        (state, year),
+        "SELECT deduction, credit FROM tax_rules WHERE code = ? AND year = ?",
+        (code, year),
     )
     row = cur.fetchone()
     if row is None:
         conn.close()
-        raise ValueError("No tax data for " + state + " in " + str(year))
+        raise ValueError("No tax data for " + code + " in " + str(year))
     deduction, credit = row
 
     brackets = []
     for upper, rate in cur.execute(
-        "SELECT upper_limit, rate FROM state_brackets WHERE state = ? AND year = ? ORDER BY rate",
-        (state, year),
+        "SELECT upper_limit, rate FROM tax_brackets WHERE code = ? AND year = ? ORDER BY rate",
+        (code, year),
     ):
         if upper is None:
             upper = float("inf")
@@ -97,37 +97,37 @@ def load_state_tax_data(state, year):
     return {"deduction": deduction, "credit": credit, "brackets": brackets}
 
 
-def get_state_tax_data(state, year):
-    key = (state, year)
-    if key not in _state_cache:
-        _state_cache[key] = load_state_tax_data(state, year)
-    return _state_cache[key]
+def get_tax_rules(code, year):
+    key = (code, year)
+    if key not in _rules_cache:
+        _rules_cache[key] = load_tax_rules(code, year)
+    return _rules_cache[key]
 
 
-def state_income_tax(gross, state, year):
-    data = get_state_tax_data(state, year)
-    taxable = max(gross - data["deduction"], 0)
-    tax = tax_owed(taxable, data["brackets"]) - data["credit"]
+def local_income_tax(gross, code, year):
+    rules = get_tax_rules(code, year)
+    taxable = max(gross - rules["deduction"], 0)
+    tax = tax_owed(taxable, rules["brackets"]) - rules["credit"]
     return max(tax, 0)
 
 
-def take_home(gross, year, state=None):
+def take_home(gross, year, places=()):
     result = gross - income_tax(gross, year) - fica_tax(gross, year)
-    if state is not None:
-        result = result - state_income_tax(gross, state, year)
+    for code in places:
+        result = result - local_income_tax(gross, code, year)
     return result
 
 
-def gross_needed(target_take_home, year, state=None):
+def gross_needed(target_take_home, year, places=()):
     low = target_take_home
     high = target_take_home * 2
 
-    while take_home(high, year, state) < target_take_home:
+    while take_home(high, year, places) < target_take_home:
         high = high * 2
 
     for _ in range(100):
         mid = (low + high) / 2
-        if take_home(mid, year, state) < target_take_home:
+        if take_home(mid, year, places) < target_take_home:
             low = mid
         else:
             high = mid
@@ -140,7 +140,8 @@ if __name__ == "__main__":
     print(round(take_home(50_000, 2025), 2))
     print(gross_needed(42_355, 2026))
     print(round(take_home(200_000, 2026), 2))
-    print(round(state_income_tax(100_000, "TX", 2026), 2))
-    print(round(state_income_tax(100_000, "IL", 2026), 2))
-    print(round(state_income_tax(100_000, "NY", 2026), 2))
-    print(round(state_income_tax(100_000, "CA", 2026), 2))
+    print(round(local_income_tax(100_000, "TX", 2026), 2))
+    print(round(local_income_tax(100_000, "IL", 2026), 2))
+    print(round(local_income_tax(100_000, "NY", 2026), 2))
+    print(round(local_income_tax(100_000, "CA", 2026), 2))
+    print(round(local_income_tax(100_000, "NYC", 2026), 2))

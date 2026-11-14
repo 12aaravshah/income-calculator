@@ -13,6 +13,7 @@ CITIES = {
     },
     "New York": {
         "state": "NY",
+        "local_tax": "NYC",
         "source": "placeholder estimate",
         "costs": {"rent": 3500, "groceries": 500, "transport": 130, "phone_internet": 120, "shopping": 200, "other": 150},
     },
