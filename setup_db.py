@@ -102,7 +102,7 @@ for city, info in CITIES.items():
     for category, amount in info["costs"].items():
         cur.execute(
             "INSERT INTO city_costs (city_id, category, monthly_cost, source) VALUES (?, ?, ?, ?)",
-            (city_id, category, amount, info["source"]),
+            (city_id, category, round(amount / 12, 2), info["source"]),
         )
 
 conn.commit()
