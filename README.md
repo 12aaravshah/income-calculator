@@ -4,6 +4,10 @@ An interactive calculator that answers one question: **what gross salary does a 
 
 It combines real cost data from the MIT Living Wage Calculator with tax rules for 2026 (federal, Social Security and Medicare, state, and New York City), then solves backwards from the take-home pay you need to the salary you'd have to earn.
 
+
+**Live demo:** https://income-calculator-8dmf4rejh52kymezha3uez.streamlit.app/
+
+
 ![The calculator](screenshot.png)
 ![All 16 cities ranked](screenshot-table.png)
 
@@ -99,4 +103,3 @@ python -m streamlit run app.py
 
 - Couples and families, using MIT's other household types
 - A job-offer comparison ("$85,000 in Boston versus $75,000 in Atlanta: what's left after taxes and costs?")
-- A live hosted version of the app
