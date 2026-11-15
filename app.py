@@ -9,6 +9,12 @@ from cities import (
     tax_codes,
 )
 
+import os
+
+# On a fresh server calculator.db doesn't exist yet, so build it first.
+if not os.path.exists("calculator.db"):
+    import setup_db
+
 YEAR = 2026
 
 st.set_page_config(page_title="Salary Needed Calculator")
